@@ -61,4 +61,4 @@ journalctl --user -u androidmouse -f
 
 ## Status
 
-Nearly ready to ship. Core functionality (mouse, keyboard, scrolling, clicks) is working. Remaining work is polish: QR code fix, daemon integration, sensitivity settings UI, tap-to-click gesture.
+Nearly ready to ship. Core functionality (mouse, keyboard, scrolling, clicks) is working. Remaining work is polish: QR code fix, tap-to-click gesture.
