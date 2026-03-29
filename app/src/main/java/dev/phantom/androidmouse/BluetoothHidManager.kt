@@ -1,4 +1,4 @@
-package com.example.androidmouse
+package dev.phantom.androidmouse
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter

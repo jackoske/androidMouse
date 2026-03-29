@@ -1,4 +1,4 @@
-package com.example.androidmouse
+package dev.phantom.androidmouse
 
 import android.util.Log
 import kotlinx.coroutines.*

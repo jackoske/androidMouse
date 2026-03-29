@@ -1,4 +1,4 @@
-package com.example.androidmouse.ui.theme
+package dev.phantom.androidmouse.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme

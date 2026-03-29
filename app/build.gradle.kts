@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.androidmouse"
+    namespace = "dev.phantom.androidmouse"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.androidmouse"
+        applicationId = "dev.phantom.androidmouse"
         minSdk = 28          // BluetoothHidDevice requires API 28
         targetSdk = 35
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.example.androidmouse
+package dev.phantom.androidmouse
 
 /**
  * HID Report Descriptor and report-building utilities.

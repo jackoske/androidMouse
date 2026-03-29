@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Mouse icon foreground — drawn within the 72dp adaptive-icon safe zone
+  Cursor arrow icon — drawn within the 72dp adaptive-icon safe zone
   (canvas is 108×108dp; safe zone is 72dp circle centred at 54,54).
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,49 +9,43 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Body -->
+    <!-- Cursor arrow — main body (white) -->
     <path
         android:fillColor="#ECEFF1"
         android:pathData="
-            M54,22
-            C38,22 34,30 34,42
-            L34,72
-            C34,82 44,86 54,86
-            C64,86 74,82 74,72
-            L74,42
-            C74,30 70,22 54,22 Z" />
+            M34,24
+            L34,80
+            L46,68
+            L58,88
+            L66,84
+            L54,64
+            L70,64
+            Z" />
 
-    <!-- Left button (shaded) -->
+    <!-- Cursor arrow — cyan edge highlight -->
     <path
-        android:fillColor="#CFD8DC"
+        android:fillColor="#00E5FF"
         android:pathData="
-            M34,42 C34,30 38,22 54,22
-            L54,55 L34,55 Z" />
+            M36,28
+            L36,74
+            L46.5,63.5
+            L58,82
+            L63,79.5
+            L51.5,60
+            L65,60
+            Z" />
 
-    <!-- Right button (shaded) -->
+    <!-- Cursor arrow — inner white face -->
     <path
-        android:fillColor="#CFD8DC"
+        android:fillColor="#FFFFFF"
         android:pathData="
-            M74,42 C74,30 70,22 54,22
-            L54,55 L74,55 Z" />
-
-    <!-- Vertical divider between buttons -->
-    <path
-        android:strokeColor="#90A4AE"
-        android:strokeWidth="1.5"
-        android:pathData="M54,22 L54,55" />
-
-    <!-- Horizontal separator -->
-    <path
-        android:strokeColor="#90A4AE"
-        android:strokeWidth="1.5"
-        android:pathData="M34,55 L74,55" />
-
-    <!-- Scroll wheel -->
-    <path
-        android:fillColor="#78909C"
-        android:pathData="
-            M51,60 Q51,58 54,58 Q57,58 57,60
-            L57,70 Q57,72 54,72 Q51,72 51,70 Z" />
+            M38,32
+            L38,69
+            L47,60
+            L57.5,77
+            L61,75.5
+            L50.5,57
+            L61,57
+            Z" />
 
 </vector>

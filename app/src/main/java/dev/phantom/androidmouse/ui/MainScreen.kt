@@ -1,4 +1,4 @@
-package com.example.androidmouse.ui
+package dev.phantom.androidmouse.ui
 
 import android.Manifest
 import android.app.Activity
@@ -49,10 +49,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.androidmouse.DiscoveredServer
-import com.example.androidmouse.HidConstants
-import com.example.androidmouse.HidViewModel
-import com.example.androidmouse.NetworkHidManager
+import dev.phantom.androidmouse.DiscoveredServer
+import dev.phantom.androidmouse.HidConstants
+import dev.phantom.androidmouse.HidViewModel
+import dev.phantom.androidmouse.NetworkHidManager
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 

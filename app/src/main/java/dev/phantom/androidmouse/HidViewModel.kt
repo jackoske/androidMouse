@@ -1,4 +1,4 @@
-package com.example.androidmouse
+package dev.phantom.androidmouse
 
 import android.app.Application
 import android.content.Context
