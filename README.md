@@ -38,7 +38,26 @@ Standard Android/Gradle build:
 ## Known issues
 
 - **QR code not working** — the terminal QR code feature for quick connection is currently broken. Use manual IP entry for now.
-- **Server must be run manually** — there's no systemd service or daemon integration yet. For production use this should be daemonized (systemd unit, etc.) rather than run in a foreground terminal.
+## Running as a systemd service
+
+Instead of running the server manually, you can install it as a systemd user service:
+
+```bash
+# Copy the unit file
+mkdir -p ~/.config/systemd/user
+cp server/androidmouse.service ~/.config/systemd/user/
+
+# Edit the ExecStart path if your repo is in a different location
+# Default assumes ~/Documents/code/androidMouse/
+
+# Enable and start
+systemctl --user daemon-reload
+systemctl --user enable --now androidmouse
+
+# Check status / logs
+systemctl --user status androidmouse
+journalctl --user -u androidmouse -f
+```
 
 ## Status
 

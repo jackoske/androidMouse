@@ -1,0 +1,11 @@
+[Unit]
+Description=Android Mouse daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 %h/Documents/code/androidMouse/server/mouse_daemon.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
