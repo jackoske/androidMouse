@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base theme for the Activity window — Compose draws its own content -->
+    <style name="Theme.AndroidMouse" parent="Theme.AppCompat.DayNight.NoActionBar" />
+</resources>
