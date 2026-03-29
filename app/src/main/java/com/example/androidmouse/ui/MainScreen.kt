@@ -19,11 +19,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -64,6 +67,7 @@ fun MainScreen(vm: HidViewModel) {
 
     var showSettings by remember { mutableStateOf(false) }
     var keyboardActive by remember { mutableStateOf(false) }
+    var selectedTab by remember { mutableIntStateOf(0) }
 
     // Start mDNS discovery when disconnected
     LaunchedEffect(netState) {
@@ -132,42 +136,76 @@ fun MainScreen(vm: HidViewModel) {
                 SettingsPanel(vm)
             }
 
-            // ── Touchpad ───────────────────────────────────────────────────
-            Touchpad(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                enabled  = isConnected,
-                onMove   = { dx, dy -> vm.moveMouse(dx, dy) },
-                onScroll = { dy -> vm.scroll(dy) },
-                onTap    = { fingers ->
-                    when (fingers) {
-                        1 -> { vm.clickDown(HidConstants.BTN_LEFT); vm.clickUp() }
-                        2 -> { vm.clickDown(HidConstants.BTN_RIGHT); vm.clickUp() }
-                        3 -> { vm.clickDown(HidConstants.BTN_MIDDLE); vm.clickUp() }
-                    }
-                },
-            )
-
-            // ── Click buttons ──────────────────────────────────────────────
-            ClickButtons(isConnected, onDown = { vm.clickDown(it) }, onUp = { vm.clickUp() })
-
-            // ── Modifier keys ──────────────────────────────────────────────
-            ModifierKeysRow(vm, isConnected)
-
-            // ── Keyboard toggle + hidden capture ───────────────────────────
-            HiddenKeyboard(vm, isConnected, keyboardActive)
-
-            FilledTonalButton(
-                onClick  = { keyboardActive = !keyboardActive },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                enabled  = isConnected,
-                shape    = RoundedCornerShape(12.dp),
+            // ── Tab bar ─────────────────────────────────────────────────────
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.primary,
+                divider = {},
             ) {
-                Icon(Icons.Default.Keyboard, null, Modifier.size(20.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    if (keyboardActive) "Hide Keyboard" else "Show Keyboard",
-                    style = MaterialTheme.typography.labelMedium,
+                Tab(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    text = { Text("Touchpad", style = MaterialTheme.typography.labelMedium) },
+                    icon = { Icon(Icons.Default.TouchApp, null, Modifier.size(18.dp)) },
                 )
+                Tab(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    text = { Text("Air Mouse", style = MaterialTheme.typography.labelMedium) },
+                    icon = { Icon(Icons.Default.PhoneAndroid, null, Modifier.size(18.dp)) },
+                )
+            }
+
+            when (selectedTab) {
+                0 -> {
+                    // ── Touchpad ───────────────────────────────────────────
+                    Touchpad(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        enabled  = isConnected,
+                        onMove   = { dx, dy -> vm.moveMouse(dx, dy) },
+                        onScroll = { dy -> vm.scroll(dy) },
+                        onTap    = { fingers ->
+                            when (fingers) {
+                                1 -> { vm.clickDown(HidConstants.BTN_LEFT); vm.clickUp() }
+                                2 -> { vm.clickDown(HidConstants.BTN_RIGHT); vm.clickUp() }
+                                3 -> { vm.clickDown(HidConstants.BTN_MIDDLE); vm.clickUp() }
+                            }
+                        },
+                    )
+
+                    // ── Click buttons ──────────────────────────────────────
+                    ClickButtons(isConnected, onDown = { vm.clickDown(it) }, onUp = { vm.clickUp() })
+
+                    // ── Modifier keys ──────────────────────────────────────
+                    ModifierKeysRow(vm, isConnected)
+
+                    // ── Keyboard toggle + hidden capture ───────────────────
+                    HiddenKeyboard(vm, isConnected, keyboardActive)
+
+                    FilledTonalButton(
+                        onClick  = { keyboardActive = !keyboardActive },
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        enabled  = isConnected,
+                        shape    = RoundedCornerShape(12.dp),
+                    ) {
+                        Icon(Icons.Default.Keyboard, null, Modifier.size(20.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            if (keyboardActive) "Hide Keyboard" else "Show Keyboard",
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+
+                1 -> {
+                    // ── Air Mouse tab ──────────────────────────────────────
+                    AirMouseTab(
+                        vm = vm,
+                        enabled = isConnected,
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                    )
+                }
             }
         }
     }
@@ -637,6 +675,151 @@ private fun HiddenKeyboard(vm: HidViewModel, enabled: Boolean, active: Boolean) 
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
             cursorBrush = SolidColor(Color.Transparent),
         )
+    }
+}
+
+// ── Air Mouse tab ───────────────────────────────────────────────────────────
+
+@Composable
+private fun AirMouseTab(vm: HidViewModel, enabled: Boolean, modifier: Modifier) {
+    val airActive by vm.airMouseActive.collectAsState()
+    val airAvailable by vm.airMouseAvailable.collectAsState()
+
+    // Stop air mouse when leaving the tab or disconnecting
+    DisposableEffect(enabled) {
+        onDispose { vm.stopAirMouse() }
+    }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        // ── Control buttons row ─────────────────────────────────────────
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // Start / Stop button
+            Button(
+                onClick = { if (airActive) vm.stopAirMouse() else vm.startAirMouse() },
+                modifier = Modifier.weight(1f).height(56.dp),
+                enabled = enabled && airAvailable,
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (airActive) MaterialTheme.colorScheme.error
+                                     else MaterialTheme.colorScheme.primary,
+                ),
+            ) {
+                Text(
+                    if (airActive) "Stop" else "Start",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+
+            // Recenter button
+            FilledTonalButton(
+                onClick = { vm.recenterAirMouse() },
+                modifier = Modifier.weight(1f).height(56.dp),
+                enabled = enabled && airActive,
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                Text(
+                    "Recenter",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+
+        if (!airAvailable) {
+            Text(
+                "Gyroscope sensor not available on this device",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
+
+        // ── Status area ─────────────────────────────────────────────────
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .weight(0.3f)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    if (airActive) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+                    else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                )
+                .border(
+                    1.dp,
+                    if (airActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                    else MaterialTheme.colorScheme.outlineVariant,
+                    RoundedCornerShape(16.dp),
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                when {
+                    !enabled -> "Connect to start"
+                    !airAvailable -> "No gyroscope"
+                    airActive -> "Move your phone to control the cursor"
+                    else -> "Tap Start to begin"
+                },
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                    alpha = if (airActive) 0.8f else 0.4f
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+            )
+        }
+
+        // ── Big click buttons ───────────────────────────────────────────
+        Row(
+            Modifier.fillMaxWidth().weight(0.7f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            BigMouseButton("L", HidConstants.BTN_LEFT, enabled, { vm.clickDown(it) }, { vm.clickUp() }, Modifier.weight(2f))
+            BigMouseButton("M", HidConstants.BTN_MIDDLE, enabled, { vm.clickDown(it) }, { vm.clickUp() }, Modifier.weight(1f))
+            BigMouseButton("R", HidConstants.BTN_RIGHT, enabled, { vm.clickDown(it) }, { vm.clickUp() }, Modifier.weight(2f))
+        }
+    }
+}
+
+@Composable
+private fun BigMouseButton(
+    label: String, mask: Int, enabled: Boolean,
+    onDown: (Int) -> Unit, onUp: () -> Unit, modifier: Modifier,
+) {
+    var pressed by remember { mutableStateOf(false) }
+    val shape = RoundedCornerShape(16.dp)
+    Surface(
+        modifier = modifier.fillMaxHeight().clip(shape).pointerInput(enabled) {
+            if (!enabled) return@pointerInput
+            awaitEachGesture {
+                awaitFirstDown(); pressed = true; onDown(mask)
+                waitForUpOrCancellation(); pressed = false; onUp()
+            }
+        },
+        color = when {
+            !enabled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            pressed  -> MaterialTheme.colorScheme.primary
+            else     -> MaterialTheme.colorScheme.surfaceVariant
+        },
+        shape = shape,
+        tonalElevation = if (pressed) 0.dp else 4.dp,
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                label,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = when {
+                    !enabled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                    pressed  -> MaterialTheme.colorScheme.onPrimary
+                    else     -> MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            )
+        }
     }
 }
 
